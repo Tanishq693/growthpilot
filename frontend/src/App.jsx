@@ -28,16 +28,18 @@ export default function App() {
     fetchSimulation(redemptionRate, demoMode);
   }, [redemptionRate, demoMode]);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+
   const fetchInitialData = async () => {
     setIsLoading(true);
     try {
-      const briefingRes = await fetch('/api/briefing');
+      const briefingRes = await fetch(`${API_BASE}/api/briefing`);
       if (briefingRes.ok) {
         const briefingData = await briefingRes.json();
         setBriefing(briefingData);
       }
 
-      const oppRes = await fetch(`/api/opportunities?demo_mode=${demoMode}`);
+      const oppRes = await fetch(`${API_BASE}/api/opportunities?demo_mode=${demoMode}`);
       if (oppRes.ok) {
         const oppData = await oppRes.json();
         setOpportunity(oppData);
@@ -54,7 +56,7 @@ export default function App() {
 
   const fetchSimulation = async (rate, mode = demoMode) => {
     try {
-      const res = await fetch('/api/simulation', {
+      const res = await fetch(`${API_BASE}/api/simulation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ redemption_rate: rate, demo_mode: mode })
@@ -70,7 +72,7 @@ export default function App() {
 
   const fetchAuditLogs = async () => {
     try {
-      const res = await fetch('/api/audit');
+      const res = await fetch(`${API_BASE}/api/audit`);
       if (res.ok) {
         const logs = await res.json();
         setAuditLogs(logs);
@@ -83,7 +85,7 @@ export default function App() {
   const handleApproveAction = async (approvalSource = "UI_BUTTON") => {
     if (!opportunity?.proposal?.action_id) return;
     try {
-      const res = await fetch(`/api/execution/approve?executor_mode=${executorMode}`, {
+      const res = await fetch(`${API_BASE}/api/execution/approve?executor_mode=${executorMode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -111,7 +113,7 @@ export default function App() {
 
   const handleResetDemo = async () => {
     try {
-      await fetch('/api/audit/reset', { method: 'POST' });
+      await fetch(`${API_BASE}/api/audit/reset`, { method: 'POST' });
       setIsApproved(false);
       setExecutionResult(null);
       setDemoMode('dead_hour');
